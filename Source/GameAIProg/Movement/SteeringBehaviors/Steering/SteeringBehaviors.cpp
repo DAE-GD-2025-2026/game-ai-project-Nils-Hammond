@@ -70,20 +70,30 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	SteeringOutput Steering{};
-	Steering.AngularVelocity = FMath::FindDeltaAngleDegrees(Agent.GetRotation(), Target.Orientation);
+
+	FVector ToTarget = FVector(Target.Position - Agent.GetPosition(), 0);
+	Steering.AngularVelocity = FMath::FindDeltaAngleDegrees(Agent.GetRotation(), ToTarget.Rotation().Yaw);
 	return Steering;
 }
 
 //PURSUIT
 SteeringOutput Pursuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
-	return SteeringOutput();
+	SteeringOutput Steering{};
+	FVector2D ToTarget = Target.Position - Agent.GetPosition();
+	FVector2D predictedTargetPos = Target.Position + Target.LinearVelocity * ToTarget.Size() / Agent.GetMaxLinearSpeed();
+	Steering.LinearVelocity = predictedTargetPos - Agent.GetPosition();
+	return Steering;
 }
 
 //EVADE
 SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
-	return SteeringOutput();
+	SteeringOutput Steering{};
+	FVector2D ToTarget = Target.Position - Agent.GetPosition();
+	FVector2D predictedTargetPos = Target.Position + Target.LinearVelocity * ToTarget.Size() / Agent.GetMaxLinearSpeed();
+	Steering.LinearVelocity = Agent.GetPosition() - predictedTargetPos;
+	return Steering;
 }
 
 //WANDER
@@ -99,7 +109,7 @@ SteeringOutput Wander::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	if (Agent.GetDebugRenderingEnabled())
 	{
 		DrawDebugCircle(Agent.GetWorld(), FVector(CircleCenter, 0), m_Radius, 32, FColor::Blue, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
-		DrawDebugCircle(Agent.GetWorld(), FVector(Target.Position, 0), 10.f, 12, FColor::Green, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
+		//DrawDebugCircle(Agent.GetWorld(), FVector(Target.Position, 0), 10.f, 12, FColor::Green, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
 		DrawDebugLine(Agent.GetWorld(), FVector(Agent.GetPosition(), 0), FVector(CircleCenter, 0.f), FColor::Red, false, -1.f, 0, 5.f);
 	}
 
