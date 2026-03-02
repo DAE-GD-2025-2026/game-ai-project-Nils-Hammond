@@ -27,10 +27,19 @@ protected:
 
 	virtual void BeginDestroy() override;
 
+	void UpdateTargets();
+
 private:
 	//Datamembers
 	bool UseMouseTarget = false;
 	bool CanDebugRender = false;
 
-	
+	ISteeringBehavior* m_pWander = nullptr;
+	ISteeringBehavior* m_pEvade = nullptr;
+	ISteeringBehavior* m_pSeek = nullptr;
+	ISteeringBehavior* m_pPrioritySteering = nullptr;
+	BlendedSteering* m_pBlendedSteering = nullptr;
+
+	ASteeringAgent* m_pDrunkAgent = nullptr;
+	ASteeringAgent* m_pPriorityAgent = nullptr;
 };

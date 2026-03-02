@@ -75,6 +75,8 @@ public:
 	Evade() = default;
 	virtual ~Evade() override = default;
 	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent& Agent) override;
+private:
+	float m_EvadeRadius = 300.f;
 };
 
 class Wander : public Seek
