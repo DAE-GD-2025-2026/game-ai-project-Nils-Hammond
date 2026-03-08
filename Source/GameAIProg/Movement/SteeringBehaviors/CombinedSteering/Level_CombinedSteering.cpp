@@ -54,7 +54,7 @@ void ALevel_CombinedSteering::UpdateTargets()
 	PriorityTarget.LinearVelocity = m_pPriorityAgent->GetLinearVelocity();
 	PriorityTarget.AngularVelocity = m_pPriorityAgent->GetAngularVelocity();
 
-	m_pBlendedSteering->SetTarget(PriorityTarget);
+	m_pBlendedSteering->SetTarget(MouseTarget);
 }
 
 // Called every frame

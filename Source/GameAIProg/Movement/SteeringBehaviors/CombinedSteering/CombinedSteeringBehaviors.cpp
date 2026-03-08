@@ -23,7 +23,10 @@ SteeringOutput BlendedSteering::CalculateSteering(float DeltaT, ASteeringAgent& 
 	BlendedSteering.LinearVelocity.Normalize();
 	
 	// TODO: Add debug drawing
-	DrawDebugLine(Agent.GetWorld(), FVector(Agent.GetPosition(), 0), FVector(Target.Position + BlendedSteering.LinearVelocity * Agent.GetMaxLinearSpeed(), 0), FColor::Green, false, -1.f, 0, 5.f);
+	if (Agent.GetDebugRenderingEnabled())
+	{
+		DrawDebugLine(Agent.GetWorld(), FVector(Agent.GetPosition(), 0), FVector(Target.Position + BlendedSteering.LinearVelocity * Agent.GetMaxLinearSpeed(), 0), FColor::Green, false, -1.f, 0, 5.f);
+	}
 
 	return BlendedSteering;
 }

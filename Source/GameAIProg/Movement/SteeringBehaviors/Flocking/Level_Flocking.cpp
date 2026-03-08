@@ -39,6 +39,9 @@ void ALevel_Flocking::Tick(float DeltaTime)
 	pFlock->Tick(DeltaTime);
 	pFlock->RenderDebug();
 	if (bUseMouseTarget)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, FString::Printf(TEXT("Mouse Target: (%f, %f)"), MouseTarget.Position.X, MouseTarget.Position.Y));
 		pFlock->SetTarget_Seek(MouseTarget);
+	}
 }
 

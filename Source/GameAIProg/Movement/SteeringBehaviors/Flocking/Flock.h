@@ -64,15 +64,15 @@ private:
 	ASteeringAgent* pAgentToEvade{nullptr};
 	
 	//Steering Behaviors
-	//std::unique_ptr<Separation> pSeparationBehavior{};
-	//std::unique_ptr<Cohesion> pCohesionBehavior{};
-	//std::unique_ptr<VelocityMatch> pVelMatchBehavior{};
-	//std::unique_ptr<Seek> pSeekBehavior{};
-	//std::unique_ptr<Wander> pWanderBehavior{};
+	TArray<std::unique_ptr<Separation>> pSeparationBehaviors{};
+	TArray<std::unique_ptr<Cohesion>> pCohesionBehaviors{};
+	TArray<std::unique_ptr<VelocityMatch>> pVelMatchBehaviors{};
+	TArray<std::unique_ptr<Seek>> pSeekBehaviors{};
+	TArray<std::unique_ptr<Wander>> pWanderBehaviors{};
 	//std::unique_ptr<Evade> pEvadeBehavior{};
 	
-	std::unique_ptr<BlendedSteering> pBlendedSteering{};
-	std::unique_ptr<PrioritySteering> pPrioritySteering{};
+	TArray<std::unique_ptr<BlendedSteering>> pBlendedSteerings{};
+	//std::unique_ptr<PrioritySteering> pPrioritySteering{};
 
 	// UI and rendering
 	bool DebugRenderSteering{false};
