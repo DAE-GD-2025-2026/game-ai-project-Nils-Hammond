@@ -16,8 +16,8 @@ void ALevel_Flocking::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TrimWorld->SetTrimWorldSize(3000.f);
-	TrimWorld->bShouldTrimWorld = true;
+	//TrimWorld->SetTrimWorldSize(3000.f);
+	//TrimWorld->bShouldTrimWorld = true;
 
 	pFlock = TUniquePtr<Flock>(
 		new Flock(
@@ -40,7 +40,6 @@ void ALevel_Flocking::Tick(float DeltaTime)
 	pFlock->RenderDebug();
 	if (bUseMouseTarget)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, FString::Printf(TEXT("Mouse Target: (%f, %f)"), MouseTarget.Position.X, MouseTarget.Position.Y));
 		pFlock->SetTarget_Seek(MouseTarget);
 	}
 }

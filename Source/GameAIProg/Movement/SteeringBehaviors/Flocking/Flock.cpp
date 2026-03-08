@@ -238,9 +238,9 @@ FVector2D Flock::GetAverageNeighborPos() const
 	FVector2D avgPosition = FVector2D::ZeroVector;
 
  // TODO: Implement
-	for (ASteeringAgent* const pNeighbor : Neighbors)
+	for (int neighborIdx = 0; neighborIdx < NrOfNeighbors; ++neighborIdx)
 	{
-		avgPosition += pNeighbor->GetPosition();
+		avgPosition += Neighbors[neighborIdx]->GetPosition();
 	}
 	avgPosition /= NrOfNeighbors;
 	

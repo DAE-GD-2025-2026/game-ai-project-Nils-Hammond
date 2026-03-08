@@ -14,9 +14,15 @@ SteeringOutput Seek::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 	// Add debug Rendering
 	if (Agent.GetDebugRenderingEnabled())
 	{
-		DrawDebugLine(Agent.GetWorld(), FVector(Agent.GetPosition(), 0), FVector(Target.Position, 0), FColor::Green, false, -1.f, 0, 5.f);
-		DrawDebugLine(Agent.GetWorld(), FVector(Agent.GetPosition(), 0), FVector(Agent.GetPosition() + Steering.LinearVelocity * Agent.GetMaxLinearSpeed(), 0), FColor::Red, false, -1.f, 0, 5.f);
-		DrawDebugCircle(Agent.GetWorld(), FVector(Target.Position, 0), 5.f, 12, FColor::Green, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
+		const FVector AgentPos3D = FVector(Agent.GetPosition(), 0.f);
+		const FVector TargetPos3D = FVector(Target.Position, 0.f);
+
+		DrawDebugLine(Agent.GetWorld(), AgentPos3D, AgentPos3D + FVector(Steering.LinearVelocity, 0.f) * Agent.GetMaxLinearSpeed() / 2, FColor::Green, false, -1.f, 0, 5.f);
+		DrawDebugLine(Agent.GetWorld(), AgentPos3D, AgentPos3D + FVector(Agent.GetLinearVelocity(), 0.f), FColor::Red, false, -1.f, 0, 5.f);
+		const FVector SteeringForce = FVector(Steering.LinearVelocity * Agent.GetMaxLinearSpeed(), 0.f) - FVector(Agent.GetLinearVelocity(), 0.f);
+		DrawDebugLine(Agent.GetWorld(), AgentPos3D, AgentPos3D + SteeringForce, FColor::Cyan, false, -1.f, 0, 5.f);
+
+		DrawDebugCircle(Agent.GetWorld(), TargetPos3D, 5.f, 12, FColor::Green, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
 	}
 
 	return Steering;
@@ -84,8 +90,8 @@ SteeringOutput Pursuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	SteeringOutput Steering{};
 	FVector2D ToTarget = Target.Position - Agent.GetPosition();
-	FVector2D predictedTargetPos = Target.Position + Target.LinearVelocity * ToTarget.Size() / Agent.GetMaxLinearSpeed();
-	Steering.LinearVelocity = predictedTargetPos - Agent.GetPosition();
+	FVector2D PredictedTargetPos = Target.Position + Target.LinearVelocity * ToTarget.Size() / Agent.GetMaxLinearSpeed();
+	Steering.LinearVelocity = PredictedTargetPos - Agent.GetPosition();
 	Steering.LinearVelocity.Normalize();
 	return Steering;
 }
