@@ -37,13 +37,13 @@ public:
 	void AddAgent(ASteeringAgent& Agent);
 	void UpdateAgentCell(ASteeringAgent& Agent, const FVector2D& OldPos);
 
-	void RegisterNeighbors(ASteeringAgent& Agent, float QueryRadius);
+	void RegisterNeighbors(ASteeringAgent& Agent, float QueryRadius, bool UsePartitioning);
 	const TArray<ASteeringAgent*>& GetNeighbors() const { return Neighbors; }
 	int GetNrOfNeighbors() const { return NrOfNeighbors; }
 
 	//empties the cells of entities
 	void EmptyCells();
-	void RenderCells()const;
+	void RenderCells(bool UsePartitioning)const;
 
 private:
 	// For debug draw purposes
