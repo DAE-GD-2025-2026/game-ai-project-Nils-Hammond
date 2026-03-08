@@ -100,6 +100,7 @@ SteeringOutput Pursuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
 	SteeringOutput Steering{};
+
 	FVector2D ToTarget = Target.Position - Agent.GetPosition();
 	if (ToTarget.Size() > m_EvadeRadius)
 		Steering.IsValid = false;

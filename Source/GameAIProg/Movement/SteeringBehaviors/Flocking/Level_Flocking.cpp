@@ -16,6 +16,13 @@ void ALevel_Flocking::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (pAgentToEvade)
+	{
+		pWanderBehavior = std::make_unique<Wander>();
+		pAgentToEvade->SetDebugRenderingEnabled(false);
+		pAgentToEvade->SetSteeringBehavior(pWanderBehavior.get());
+	}
+	
 	//TrimWorld->SetTrimWorldSize(1000.f);
 	//TrimWorld->bShouldTrimWorld = true;
 
@@ -30,10 +37,21 @@ void ALevel_Flocking::BeginPlay()
 			);
 }
 
+void ALevel_Flocking::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	if (pAgentToEvade)
+		pAgentToEvade->Destroy();
+}
+
 // Called every frame
 void ALevel_Flocking::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (pAgentToEvade != nullptr)
+		pAgentToEvade->Tick(DeltaTime);
 
 	pFlock->ImGuiRender(WindowPos, WindowSize);
 	pFlock->Tick(DeltaTime);

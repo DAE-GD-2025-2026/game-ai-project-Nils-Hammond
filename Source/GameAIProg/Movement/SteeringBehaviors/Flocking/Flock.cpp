@@ -30,6 +30,8 @@ Flock::Flock(
 	pSeekBehaviors.SetNum(FlockSize);
 	pWanderBehaviors.SetNum(FlockSize);
 	pBlendedSteerings.SetNum(FlockSize);
+	pEvadeBehaviors.SetNum(FlockSize);
+	pPrioritySteerings.SetNum(FlockSize);
 
 	for (int i = 0; i < FlockSize; ++i)
 	{
@@ -53,8 +55,10 @@ Flock::Flock(
 			{ pWanderBehaviors[i].get(), 0.2f}
 		});
 
+		pEvadeBehaviors[i] = std::make_unique<Evade>();
+		pPrioritySteerings[i] = std::make_unique<PrioritySteering>(std::vector<ISteeringBehavior*>{pEvadeBehaviors[i].get(), pBlendedSteerings[i].get()});
 
-		Agents[i]->SetSteeringBehavior(pBlendedSteerings[i].get());
+		Agents[i]->SetSteeringBehavior(pPrioritySteerings[i].get());
 		Agents[i]->SetDebugRenderingEnabled(false);
 #ifdef GAMEAI_USE_SPACE_PARTITIONING
 		pPartitionedSpace->AddAgent(*Agents[i]);
@@ -80,26 +84,52 @@ void Flock::Tick(float DeltaTime)
 	{
 #ifdef GAMEAI_USE_SPACE_PARTITIONING
 		pPartitionedSpace->UpdateAgentCell(*Agents[i], OldPositions[i]);
+		pPartitionedSpace->RegisterNeighbors(*Agents[i], NeighborhoodRadius, DebugRenderPartitions);
 		OldPositions[i] = Agents[i]->GetPosition();
 #else
 		NrOfNeighbors = 0;
 		RegisterNeighbors(pAgent);
 #endif
+		if (pAgentToEvade != nullptr)
+		{
+			FTargetData EvadeTarget;
+			EvadeTarget.Position = pAgentToEvade->GetPosition();
+			EvadeTarget.Orientation = pAgentToEvade->GetRotation();
+			EvadeTarget.LinearVelocity = pAgentToEvade->GetLinearVelocity();
+			EvadeTarget.AngularVelocity = pAgentToEvade->GetAngularVelocity();
+
+			pEvadeBehaviors[i]->SetTarget(EvadeTarget);
+		}
+		else
+		{
+			FTargetData EvadeTarget{};
+			EvadeTarget.Position = FVector2D(10000, 10000);
+			pEvadeBehaviors[i]->SetTarget(EvadeTarget);
+		}
 		Agents[i]->Tick(DeltaTime);
 	}
- // TODO: update the flock
- // TODO: for every agent:
-  // TODO: register the neighbors for this agent (-> fill the memory pool with the neighbors for the currently evaluated agent)
-  // TODO: update the agent (-> the steeringbehaviors use the neighbors in the memory pool)
-  // TODO: trim the agent to the world
+
 }
 
 void Flock::RenderDebug()
 {
 #ifdef GAMEAI_USE_SPACE_PARTITIONING
-	pPartitionedSpace->RenderCells(bUsePartitioning);
+	pPartitionedSpace->RenderCells(DebugRenderPartitions);
 #endif
  // TODO: Render all the agents in the flock
+	if (DebugRenderNeighborhood)
+	{
+		DrawDebugCircle(pWorld, FVector(Agents[0]->GetPosition(), 0), NeighborhoodRadius, 32, FColor::Green, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
+		const TArray<ASteeringAgent*> Neighbors = GetNeighbors();
+		for (int i = 0; i < NrOfNeighbors; ++i)
+		{
+			FVector NeighborPos = FVector(Neighbors[i]->GetPosition(), 0);
+			float Radius = 100.f;
+			DrawDebugCircle(pWorld, NeighborPos, Radius, 32, FColor::Green, false, -1.f, 0, 5.f, FVector(1, 0, 0), FVector(0, 1, 0), false);
+			DrawDebugLine(pWorld, NeighborPos + FVector(-Radius, 0.f, 0.f), NeighborPos + FVector(Radius, 0.f, 0.f), FColor::Green, false, -1, 0, 5.f);
+			DrawDebugLine(pWorld, NeighborPos + FVector(0.f, -Radius, 0.f), NeighborPos + FVector(0.f, Radius, 0.f), FColor::Green, false, -1, 0, 5.f);
+		}
+	}
 }
 
 void Flock::ImGuiRender(ImVec2 const& WindowPos, ImVec2 const& WindowSize)
@@ -140,11 +170,10 @@ void Flock::ImGuiRender(ImVec2 const& WindowPos, ImVec2 const& WindowSize)
 		ImGui::Text("Flocking");
 		ImGui::Spacing();
 
-		// Button to change between partitioning or not
-		ImGui::Checkbox("Use Spacial Partitioning", &bUsePartitioning);
-
-  // TODO: implement ImGUI checkboxes for debug rendering here
-
+		// Debug Rendering
+		//ImGui::Checkbox("Render Steering", &DebugRenderSteering);			Not Implemented
+		//ImGui::Checkbox("Render Neighborhood", &DebugRenderNeighborhood);	Not Working
+		ImGui::Checkbox("Use Spacial Partitioning", &DebugRenderPartitions);
 
 		ImGui::Text("Behavior Weights");
 		ImGui::Spacing();
@@ -265,8 +294,8 @@ FVector2D Flock::GetAverageNeighborVelocity() const
 
 void Flock::SetTarget_Seek(FSteeringParams const& Target)
 {
-	for (int i = 0; i < pBlendedSteerings.Num(); ++i)
+	for (int i = 0; i < pSeekBehaviors.Num(); ++i)
 	{
-		pBlendedSteerings[i]->SetTarget(Target);
+		pSeekBehaviors[i]->SetTarget(Target);
 	}
 }

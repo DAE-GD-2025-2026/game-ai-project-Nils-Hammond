@@ -51,7 +51,6 @@ private:
 	int FlockSize{0};
 	TArray<ASteeringAgent*> Agents{};
 #ifdef GAMEAI_USE_SPACE_PARTITIONING
-	bool bUsePartitioning{ false };
 	std::unique_ptr<CellSpace> pPartitionedSpace{};
 	int NrOfCellsX{ 10 };
 	TArray<FVector2D> OldPositions{};
@@ -70,14 +69,14 @@ private:
 	TArray<std::unique_ptr<VelocityMatch>> pVelMatchBehaviors{};
 	TArray<std::unique_ptr<Seek>> pSeekBehaviors{};
 	TArray<std::unique_ptr<Wander>> pWanderBehaviors{};
-	//std::unique_ptr<Evade> pEvadeBehavior{};
+	TArray<std::unique_ptr<Evade>> pEvadeBehaviors{};
 	
 	TArray<std::unique_ptr<BlendedSteering>> pBlendedSteerings{};
-	//std::unique_ptr<PrioritySteering> pPrioritySteering{};
+	TArray<std::unique_ptr<PrioritySteering>> pPrioritySteerings{};
 
 	// UI and rendering
 	bool DebugRenderSteering{false};
-	bool DebugRenderNeighborhood{true};
+	bool DebugRenderNeighborhood{false};
 	bool DebugRenderPartitions{true};
 
 	void RenderNeighborhood();

@@ -20,13 +20,15 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
 	bool bUseMouseTarget{true};
 
-	int const FlockSize{200};
+	int const FlockSize{100};
 
 	TUniquePtr<Flock> pFlock{};
 	
 	UPROPERTY(EditAnywhere, Category = "Flocking")
 	ASteeringAgent* pAgentToEvade{nullptr}; // non owning ref
+	std::unique_ptr<ISteeringBehavior> pWanderBehavior{};
 };
